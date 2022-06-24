@@ -1,0 +1,53 @@
+[
+    {
+      "id": 1,
+      "name": "Alfredo",
+      "image":"static/assets/images/alfredo.png"
+    },
+    {
+      "id": 2,
+      "name": "Blas",
+      "image": "static/assets/images/blas.png"
+    },
+    {
+      "id": 3,
+      "name": "Claudia",
+      "image":"static/assets/images/claudia.png"
+    },
+    {
+      "id": 4,
+      "name": "Ernesto",
+      "image":"static/assets/images/ernesto.png"
+    },
+    {
+      "id": 5,
+      "name": "Fabrizio",
+      "image": "static/assets/images/fabrizio.png"
+    },
+    {
+      "id": 6,
+      "name": "Franco",
+      "image": "static/assets/images/franco.png"
+    },
+    {
+      "id": 7,
+      "name": "Isabella",
+      "image": "static/assets/images/isabella.png"
+    },
+    {
+      "id": 8,
+      "name": "Julieta",
+      "image": "static/assets/images/julieta.png"
+    },
+    {
+      "id": 9,
+      "name": "Renata",
+      "image": "static/assets/images/renata.png"
+    },
+    {
+      "id": 10,
+      "name": "Valentina",
+      "image": "static/assets/images/valentina.png"
+    }
+  ]
+  

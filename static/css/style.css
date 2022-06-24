@@ -1,0 +1,251 @@
+/*  */
+/* Common Styles */
+/*  */
+@import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif; 
+  text-transform: uppercase;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  flex-direction: column;
+  text-align: center;
+  background-image: url('../assets/styles/background.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: top; 
+}
+
+/*  */
+/* Title Styles */
+/*  */
+.container-titles
+{
+  text-align: center;
+  padding-bottom: 1.5rem;
+}
+
+.main-title {
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-shadow:  1px 4px 6px #000 !important;
+}
+
+.main-title p {
+  font-size: 2rem;
+  padding: 0.5rem;
+  font-weight: bold;
+  letter-spacing: 0.1rem;
+  text-align: center;
+  overflow: hidden;
+}
+.main-title p span.typed-text {
+  font-weight: normal;
+  color: #dd7732;
+}
+.main-title p span.cursor {
+  display: inline-block;
+  color: #ccc;
+  background-color: #ccc;
+  margin-left: 0.1rem;
+  width: 2px;
+  animation: blink 1s infinite;
+}
+
+.main-title p span.cursor.typing {
+  animation: none;
+}
+@keyframes blink {
+  0%  { background-color: #ccc; }
+  49% { background-color: #ccc; }
+  50% { background-color: transparent; }
+  99% { background-color: transparent; }
+  100%  { background-color: #ccc; }
+}
+
+#sub-title p
+{
+	margin:0;
+	overflow: hidden;
+}
+
+#sub-title p span{
+    font-size: 1.5rem;
+    color:#dd7732;
+    text-shadow:  1px 4px 6px #000;
+    font-weight: 700;
+    display: inline-block;
+    line-height: 46px;
+    display: none;
+}
+
+#sub-title p span.text-in{
+	display: block;
+	animation: textIn .3s linear;
+}
+#sub-title p span.text-out{
+	animation: textOut .3s linear;
+}
+@keyframes textIn{
+	0%{
+		transform: translateY(100%);
+	}
+	100%{
+		transform: translateY(0%);
+	}
+}
+@keyframes textOut{
+	0%{
+		transform: translateY(0%);
+	}
+	100%{
+		transform: translateY(-100%);
+
+	}
+}
+
+/*  */
+/* Video styles */
+/*  */
+#video
+{
+  width: 300px;
+  height: 200x;
+  background-color: #151515;
+  border: 5px solid;
+  border-radius: 0.2rem;
+  border-image: linear-gradient(#0f0, #00e6ff) 1;
+  animation: rotate 2.5s ease-in infinite;
+}
+
+@media only screen and (min-width: 1000px) {
+  #video {width: 720px; height: 480px;}
+}
+
+@keyframes rotate {
+  50%{
+    border-image: linear-gradient(360deg,#0f0, #00e6ff) 1;
+  }
+}
+
+/*  */
+/* Button Styles */
+/*  */
+.container-buttons
+{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+@media only screen and (min-width: 1000px) {
+  .container-buttons {margin-top: 2rem; flex-direction: row;}
+}
+
+.container-buttons a
+{
+  position: relative;
+  display: inline-block;
+  padding: 15px 30px;
+  border: 2px solid #0f0;
+  margin: 40px;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: 2px;
+  color:#fff;
+  -webkit-box-reflect: below 0px linear-gradient(transparent, #0002);
+  transition: 0.5s;
+  transition-delay: 0s;
+}
+
+.container-buttons a:hover
+{
+  transition-delay: 1.5s;
+  color:#000;
+  box-shadow: 0 0 10px #0f0,
+              0 0 20px #0f0,
+              0 0 40px #0f0,
+              0 0 80px #0f0,
+              0 0 100px #0f0;
+}
+
+.container-buttons a span
+{
+  position: relative;
+  z-index: 100;
+}
+
+.container-buttons a:nth-child(2)
+{
+  filter: hue-rotate(80deg)
+}
+
+.container-buttons a::before
+{
+  content:'';
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 2px;
+  background: #0f0;
+  box-shadow: 5px -8px 0 #0f0,
+              5px 8px 0 #0f0;
+  transition: width 0.5s, left 0.5s, height 0.5s, box-shadow 0.5s;
+  transition-delay: 1s, 0.5s, 0s, 0s;
+}
+
+.container-buttons a:hover::before
+{
+  content:'';
+  width: 60%;
+  height: 100%;
+  left: -2px;
+  box-shadow: 5px 0 0 #0f0,
+              5px 0 0 #0f0;
+  transition-delay: 0s, 0.5, 0.5s, 1s; 
+}
+
+.container-buttons a::after
+{
+  content:'';
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 2px;
+  background: #0f0;
+  box-shadow: -5px -8px 0 #0f0,
+              -5px 8px 0 #0f0;
+  transition: width 0.5s, left 0.5s, height 0.5s,
+  box-shadow 0.5s;
+  transition-delay: 1s, 0.5s, 0s, 0s;
+}
+
+.container-buttons a:hover::after
+{
+  content:'';
+  width: 60%;
+  height: 100%;
+  right: -2px;
+  box-shadow: -5px 0 0 #0f0,
+              -5px 0 0 #0f0;
+  transition-delay: 0s, 0.5, 0.5s, 1s; 
+}
+
+
+
