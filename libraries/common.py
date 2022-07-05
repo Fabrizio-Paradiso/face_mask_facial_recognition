@@ -51,12 +51,12 @@ def bounding_box_face_mask(detection_hog: tuple, faces: tuple, frame: numpy.ndar
     Return:
         None
     """
-    cv2.rectangle(frame, (faces[0][0]-1, faces[0][1]-52), (faces[0][0]+faces[0][2]+1, faces[0][1]-20), WHITE_COLOR, -1)
+    cv2.rectangle(frame, (faces[0,0]-1, faces[0,1]-52), (faces[0,0]+faces[0,2]+1, faces[0,1]-20), WHITE_COLOR, -1)
     if abs(svm_model.decision_function(mask_features)) > MARGIN_SVM_DECISION:
-        cv2.putText(frame, f"{detection_hog[0]}", (faces[0][0], faces[0][1]-30), TEXT_FONT, FONT_SCALE, RED_COLOR, LINE_THICKNESS)
+        cv2.putText(frame, f"{detection_hog[0]}", (faces[0,0], faces[0,1]-30), TEXT_FONT, FONT_SCALE, RED_COLOR, LINE_THICKNESS)
 
     elif abs(svm_model.decision_function(mask_features)) < MARGIN_SVM_DECISION:
-        cv2.putText(frame, f"{detection_hog[0]}", (faces[0][0], faces[0][1]-30), TEXT_FONT, FONT_SCALE, GREEN_COLOR, LINE_THICKNESS)
+        cv2.putText(frame, f"{detection_hog[0]}", (faces[0,0], faces[0,1]-30), TEXT_FONT, FONT_SCALE, GREEN_COLOR, LINE_THICKNESS)
 
 def bounding_box_face_name_recognition(faces: tuple, frame: numpy.ndarray, recognition_hog: tuple) -> None:
     """
@@ -67,9 +67,9 @@ def bounding_box_face_name_recognition(faces: tuple, frame: numpy.ndarray, recog
     Return:
         None
     """
-    cv2.rectangle(frame, (faces[0][0], faces[0][1]), (faces[0][0]+faces[0][2], faces[0][1]+faces[0][3]), GREEN_COLOR, 2)
-    cv2.rectangle(frame, (faces[0][0]-1, faces[0][1]-20), (faces[0][0]+faces[0][2]+1, faces[0][1]+5), GREEN_COLOR, -1)
-    cv2.putText(frame, f"{recognition_hog[0]}", (faces[0][0], faces[0][1]), TEXT_FONT, FONT_SCALE, (255,255,255), LINE_THICKNESS)
+    cv2.rectangle(frame, (faces[0,0], faces[0,1]), (faces[0,0]+faces[0,2], faces[0,1]+faces[0,3]), GREEN_COLOR, 2)
+    cv2.rectangle(frame, (faces[0,0]-1, faces[0,1]-20), (faces[0,0]+faces[0,2]+1, faces[0,1]+5), GREEN_COLOR, -1)
+    cv2.putText(frame, f"{recognition_hog[0]}", (faces[0,0], faces[0,1]), TEXT_FONT, FONT_SCALE, WHITE_COLOR, LINE_THICKNESS)
 
 def create_bounding_box(detection_hog: tuple, faces: tuple, frame: numpy.ndarray, mask_features: tuple, recognition_hog: tuple, svm_model: sklearn.svm._classes.LinearSVC,) -> None:
     """
@@ -141,7 +141,7 @@ def rename_images(path_images: str, prefix_name: str) -> None:
         os.rename(os.path.join(path_images,file), os.path.join(path_images,f"{prefix_name}_{index_image}.jpg"))
 
 def resize_images_in_directory(path_directory: str, final_size: tuple):
-        for image_path in paths.list_images(path_directory):      
+        for image_path in paths.list_images(path_directory):
             image = cv2.imread(image_path)
             image_resized = cv2.resize(src = image, dsize=RESIZE_SIZE)
             image_filtered = cv2.GaussianBlur(image_resized, BLUR_FILTER_SIZE, cv2.BORDER_DEFAULT)

@@ -124,7 +124,7 @@ class Hog:
         model.fit(data, labels)
         joblib.dump(model, svm_model_name)
 
-    def visualize_hog_image(image_path: str):
+    def visualize_hog_image(self, image_path: str):
         """"
         Visualize HOG image in a window in case it is necessary to adjust HOG parameters
 
@@ -133,17 +133,17 @@ class Hog:
         Return:
             None
         """
-        image = cv2.imread(os.path.normpath("static/assets/images/fabrizio.png"))
+        image = cv2.imread(os.path.normpath(image_path))
         image_resized = cv2.resize(src = image, dsize=(850,955))
         image_filtered = cv2.GaussianBlur(image_resized, (7,7), cv2.BORDER_DEFAULT)
         gray_image = cv2.cvtColor(image_filtered, cv2.COLOR_BGR2GRAY)
         gray_image = cv2.resize(gray_image, (128, 144))
         (_, hog_image) = hog(gray_image,
-                            orientations=9,
-                            pixels_per_cell=(8, 8),
-	                        cells_per_block=(2, 2),
-                            block_norm="L1",
-	                        visualize=True)
+                            orientations = self.ORIENTATIONS,
+                            pixels_per_cell = self.PIXELS_PER_CELL,
+	                        cells_per_block = self.CELLS_PER_BLOCK,
+                            block_norm = self.BLOCK_NORM,
+	                        visualize = True)
         hog_image = rescale_intensity(hog_image, out_range=(0, 255))
         hog_image = hog_image.astype("uint8")
         cv2.imshow("HOG Image", hog_image)
