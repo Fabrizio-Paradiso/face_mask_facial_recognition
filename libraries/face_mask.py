@@ -44,24 +44,6 @@ class FaceMask:
             dir = os.path.join(dataset_dir, category)
             self.export_roi_in_directory(dir, export_dir, prefix_name=f"roi_")
 
-    def export_resize_image_in_directory(self, dir: str, export_dir: str, prefix_name: str) -> None:
-        """
-        Resize Images in ROI and export in desired path
-
-        Args:
-            dir (str): Directory of face or mask images
-            export_dir (str): Export directory where cropped images are exported
-            prefix_name (str): Prefix to add for all images in directory
-        Return:
-            None
-        """
-        for image_path in paths.list_images(dir):
-            image = cv2.imread(image_path)
-            resize_image = cv2.resize(src = image, dsize=(32,36))
-            filename = str(os.path.basename(image_path.split(".")[0]))
-            print(os.path.join(export_dir, f"{prefix_name}{filename}.jpg"))
-            cv2.imwrite(os.path.join(export_dir, f"{prefix_name}{filename}.jpg"), resize_image)
-
     def export_roi_in_directory(self, dir: str, export_dir: str, prefix_name: str) -> None:
         """
         Crop Test Images in ROI and export in desired path
@@ -75,14 +57,14 @@ class FaceMask:
         """
         for image_path in paths.list_images(dir):
             image = cv2.imread(image_path)
-            crop_image = self.get_crop_based_on_geometrical_face_model(image)
+            crop = self.geometrical_face_model_roi_image(image)
             filename = str(os.path.basename(image_path.split(".")[0]))
             print(os.path.join(export_dir, f"{prefix_name}{filename}.jpg"))
-            cv2.imwrite(os.path.join(export_dir, f"{prefix_name}{filename}.jpg"), crop_image)
+            cv2.imwrite(os.path.join(export_dir, f"{prefix_name}{filename}.jpg"), crop)
 
-    def face_mask_features(self, faces: tuple, gray_image: numpy.ndarray) -> tuple:
+    def face_mask_detection(self, faces: tuple, gray_image: numpy.ndarray, svm_model: sklearn.svm._classes.LinearSVC) -> tuple:
         """
-        Face-Mask features in Real-Time
+        Face-Mask detection in Real-Time
 
         Args:
             faces (tuple): Coordinates, width and height from faces detected by Haar Cascade Frontal Face
@@ -94,8 +76,8 @@ class FaceMask:
         """
         coordinates_roi = self.geometrical_face_model_roi_coordinates(faces)
         crop_image = self.resize_crop_roi(coordinates_roi, gray_image)
-        hog_features = self.hog.extract_features(crop_image)
-        return hog_features
+        prediction, hog_features = self.hog.extract_features_and_predict(crop_image, svm_model)
+        return prediction, hog_features
 
     @staticmethod
     def geometrical_face_model_roi_coordinates(faces: tuple, training_case: bool=False) -> tuple:
@@ -112,11 +94,10 @@ class FaceMask:
             faces = faces[0][3] > MIN_FACE_HEIGHT and faces[0][3] < MAX_FACE_HEIGHT
 
         for (x, y, w, h) in faces:
-            x1 = int(w/8) + x
-            y1 = int(h/2) + y
-            x2 = int(w*7/8) + x
-            y2 = int(h*8/9) + y
-
+            x1 = math.floor(w/8) + x
+            y1 = math.floor(h*5/10) + y
+            x2 = math.ceil(w*7/8) + x
+            y2 = math.ceil(h) + y
         return [x1, x2, y1, y2]
 
     def geometrical_face_model_roi_image(self, image: numpy.ndarray) -> numpy.ndarray:
@@ -140,16 +121,6 @@ class FaceMask:
             coordinates = self._approximated_roi_coordinates(image)
         finally:
             return self.resize_crop_roi(coordinates, image)
-
-    def get_crop_based_on_geometrical_face_model(self, image: numpy.ndarray) -> numpy.ndarray:
-        height, width,_ = image.shape
-        xo1 = int(width/8)
-        yo1 = int(height*1/2)
-        xo2 = int(width*7/8)
-        yo2 = int(height*8/9)
-        crop_image = image[yo1:yo2, xo1:xo2]
-
-        return crop_image
 
     @staticmethod
     def _preprocessing_image_to_gray(image: numpy.ndarray) -> numpy.ndarray:
@@ -178,5 +149,5 @@ class FaceMask:
             Cropped and resized image
         """
         crop_image = image[coordinates[2]:coordinates[3], coordinates[0]:coordinates[1]]
-        crop_resized = cv2.resize(crop_image, dsize=(32,36))
+        crop_resized = cv2.resize (crop_image, dsize=CROP_SIZE)
         return crop_resized
