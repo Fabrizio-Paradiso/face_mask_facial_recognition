@@ -1,4 +1,4 @@
-from config import BLUR_FILTER_SIZE, FONT_SCALE, GREEN_COLOR, LINE_THICKNESS, MARGIN_SVM_DECISION, MATCH_SCALE, RED_COLOR, RESIZE_SIZE, TEXT_COORDINATES, TEXT_FONT, WHITE_COLOR
+from config import BLUR_FILTER_SIZE, FONT_SCALE, GREEN_COLOR, BLACK_COLOR, LINE_THICKNESS, MATCH_SCALE, RESIZE_SIZE, TEXT_COORDINATES, TEXT_FONT, WHITE_COLOR
 from datetime import datetime
 from imutils import paths
 import cv2
@@ -20,7 +20,7 @@ def add_date_to_frame(frame: numpy.ndarray) -> None:
     """
     cv2.putText(frame, str(datetime.now()), TEXT_COORDINATES, TEXT_FONT, FONT_SCALE, GREEN_COLOR, LINE_THICKNESS)
 
-def add_match_to_frame(frame: numpy.ndarray, recognition_hog: tuple, text_coordinates: str = (520, 360)) -> None:
+def add_match_to_frame(frame: numpy.ndarray, prediction_recognition: int, text_coordinates: str = (520, 360)) -> None:
     """
     Add Match Found image in right bottom corner of frame
 
@@ -31,7 +31,7 @@ def add_match_to_frame(frame: numpy.ndarray, recognition_hog: tuple, text_coordi
     Return:
         None
     """
-    image_path = json_name_to_image_person(str(recognition_hog[0]))
+    image_path = json_id_to_image_person(prediction_recognition)
     match_image = cv2.imread(f"{image_path}")
     size = 100
     logo = cv2.resize(match_image, (size, size))
@@ -39,10 +39,19 @@ def add_match_to_frame(frame: numpy.ndarray, recognition_hog: tuple, text_coordi
     _, mask = cv2.threshold(gray_logo, 1, 255, cv2.THRESH_BINARY)
     roi = frame[-size-10:-10, -size-10:-10]
     roi[numpy.where(mask)] = 0
-    cv2.putText(frame, f"Match found", text_coordinates, TEXT_FONT, MATCH_SCALE, GREEN_COLOR, LINE_THICKNESS)
+    cv2.putText(frame, f"Match found", text_coordinates, TEXT_FONT, MATCH_SCALE, BLACK_COLOR, LINE_THICKNESS)
     roi += logo
 
-def bounding_box_face_mask(detection_hog: tuple, faces: tuple, frame: numpy.ndarray, mask_features: tuple, svm_model: sklearn.svm._classes.LinearSVC) -> None:
+def blur_and_resize_images_in_directory(path_directory: str):
+    for image_path in paths.list_images(path_directory):
+        image = cv2.imread(image_path)
+        image_filtered = cv2.GaussianBlur(image, (3,3), cv2.BORDER_DEFAULT)
+        image_resized = cv2.resize(src = image_filtered, dsize=RESIZE_SIZE)
+        cv2.imwrite(image_path, image_resized)
+        print(image_path)
+
+
+def header_face_mask(faces: tuple, frame: numpy.ndarray, prediction: int) -> None:
     """
     Bounding box for Face-Mask Detection
 
@@ -51,42 +60,49 @@ def bounding_box_face_mask(detection_hog: tuple, faces: tuple, frame: numpy.ndar
     Return:
         None
     """
-    cv2.rectangle(frame, (faces[0,0]-1, faces[0,1]-52), (faces[0,0]+faces[0,2]+1, faces[0,1]-20), WHITE_COLOR, -1)
-    if abs(svm_model.decision_function(mask_features)) > MARGIN_SVM_DECISION:
-        cv2.putText(frame, f"{detection_hog[0]}", (faces[0,0], faces[0,1]-30), TEXT_FONT, FONT_SCALE, RED_COLOR, LINE_THICKNESS)
+    prediction_label = json_id_to_mask_label(prediction[0])
+    cv2.rectangle(frame, (faces[0][0]-1, faces[0][1]-52), (faces[0][0]+faces[0][2]+1, faces[0][1]-20), WHITE_COLOR, -1)
+    cv2.putText(frame, f"{prediction_label}", (faces[0,0], faces[0,1]-30), TEXT_FONT, FONT_SCALE, BLACK_COLOR, LINE_THICKNESS)
 
-    elif abs(svm_model.decision_function(mask_features)) < MARGIN_SVM_DECISION:
-        cv2.putText(frame, f"{detection_hog[0]}", (faces[0,0], faces[0,1]-30), TEXT_FONT, FONT_SCALE, GREEN_COLOR, LINE_THICKNESS)
-
-def bounding_box_face_name_recognition(faces: tuple, frame: numpy.ndarray, recognition_hog: tuple) -> None:
+def header_face_recognition(faces: tuple, frame: numpy.ndarray, prediction: int) -> None:
     """
-    Bounding box for Face-Name Recognition
+    Header for Face-Name Recognition
 
     Args:
         Inherit from create_bounding_box()
     Return:
         None
     """
-    cv2.rectangle(frame, (faces[0,0], faces[0,1]), (faces[0,0]+faces[0,2], faces[0,1]+faces[0,3]), GREEN_COLOR, 2)
-    cv2.rectangle(frame, (faces[0,0]-1, faces[0,1]-20), (faces[0,0]+faces[0,2]+1, faces[0,1]+5), GREEN_COLOR, -1)
-    cv2.putText(frame, f"{recognition_hog[0]}", (faces[0,0], faces[0,1]), TEXT_FONT, FONT_SCALE, WHITE_COLOR, LINE_THICKNESS)
+    prediction_label = json_id_to_recognition_label(prediction[0])
+    cv2.rectangle(frame, (faces[0,0]-1, faces[0,1]-20), (faces[0,0]+faces[0,2]+1, faces[0,1]+5), WHITE_COLOR, -1)
+    cv2.putText(frame, f"{prediction_label}", (faces[0,0], faces[0,1]), TEXT_FONT, FONT_SCALE, BLACK_COLOR, LINE_THICKNESS)
 
-def create_bounding_box(detection_hog: tuple, faces: tuple, frame: numpy.ndarray, mask_features: tuple, recognition_hog: tuple, svm_model: sklearn.svm._classes.LinearSVC,) -> None:
+def face_bounding_box(faces: tuple, frame: numpy.ndarray) -> None:
+    """
+    Bounding box for face detection
+
+    Args:
+        Inherit from create_bounding_box()
+    Return:
+        None
+    """
+    cv2.rectangle(frame, (faces[0,0], faces[0,1]), (faces[0,0]+faces[0,2], faces[0,1]+faces[0,3]), WHITE_COLOR, 2)
+
+def create_bounding_box(faces: tuple, frame: numpy.ndarray, mask_prediction: tuple, recognition_prediction: tuple) -> None:
     """
     Create bounding box for user interface
 
     Args:
-        detection_hog (tuple): Decision about Decision about Face-Mask Detection made by SVM linear model
         faces (tuple): Coordinates, width and height from faces detected by Haar Cascade Frontal Face
         frame (numpy.ndarray): Frame captured by camera in Real-Time
-        mask_features (tuple): Features obtained with HOG in Mask ROI
-        model (sklearn.svm._classes.LinearSVC): SVM Linear Model in charge of Face-Mask Detection
-        recognition_hog (tuple): Decision about Face-Name Recognition made by SVM multi-class linear model
+        mask_prediction (tuple): Prediction about wearing mask in integer
+        recognition_prediction (tuple): Prediction about person in integer
     Return:
         None
     """
-    bounding_box_face_name_recognition(faces, frame, recognition_hog)
-    bounding_box_face_mask(detection_hog, faces, frame, mask_features, svm_model)
+    face_bounding_box(faces, frame)
+    header_face_recognition(faces, frame, recognition_prediction)
+    header_face_mask(faces, frame, mask_prediction)
 
 def get_ip_address_raspberry() -> str:
     """
@@ -110,7 +126,37 @@ def get_ip_address_pc() -> str:
     """
     return socket.gethostbyname(socket.gethostname())
 
-def json_name_to_image_person(name: str) -> str:
+def json_id_to_mask_label(id: int) -> str:
+    """
+    Find the label for Face-Mask detection searching by id
+
+    Args:
+        id (int): Name to make the query in JSON file
+    Return:
+        Image path located in static folder
+    """
+    with open("static/json/mask.json") as json_file:
+        items = json.load(json_file)
+
+    item = next((item for item in items if item["id"] == id), None)
+    return str(item["label"])
+
+def json_id_to_recognition_label(id: int) -> str:
+    """
+    Find the label for Face-Recognition searching by id
+
+    Args:
+        id (int): Name to make the query in JSON file
+    Return:
+        Image path located in static folder
+    """
+    with open("static/json/people.json") as json_file:
+        items = json.load(json_file)
+
+    item = next((item for item in items if item["id"] == id), None)
+    return str(item["name"])
+
+def json_id_to_image_person(id: int) -> str:
     """
     Find the image path in json searching by person's name
 
@@ -122,7 +168,7 @@ def json_name_to_image_person(name: str) -> str:
     with open("static/json/people.json") as json_file:
         people = json.load(json_file)
 
-    person = next((person for person in people if person["name"] == name), None)
+    person = next((person for person in people if person["id"] == id), None)
     return str(person["image"])
 
 def rename_images(path_images: str, prefix_name: str) -> None:
@@ -139,15 +185,6 @@ def rename_images(path_images: str, prefix_name: str) -> None:
     for index, file in enumerate(files):
         index_image = str(index)
         os.rename(os.path.join(path_images,file), os.path.join(path_images,f"{prefix_name}_{index_image}.jpg"))
-
-def resize_images_in_directory(path_directory: str, final_size: tuple):
-        for image_path in paths.list_images(path_directory):
-            image = cv2.imread(image_path)
-            image_resized = cv2.resize(src = image, dsize=RESIZE_SIZE)
-            image_filtered = cv2.GaussianBlur(image_resized, BLUR_FILTER_SIZE, cv2.BORDER_DEFAULT)
-            image_resized = cv2.resize(image_filtered, final_size)
-            cv2.imwrite(image_path, image_resized)
-            print(image_path)
 
 def show_face_mask_roi(frame: numpy.ndarray, coordinates: tuple) -> None:
     """
