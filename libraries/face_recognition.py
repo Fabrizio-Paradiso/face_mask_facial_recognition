@@ -1,5 +1,7 @@
 from config import FINAL_SIZE, XO1_FACTOR, XO2_FACTOR, YO1_FACTOR, YO2_FACTOR
 from .hog import Hog
+from PIL import Image
+from imutils import paths
 import cv2
 import math
 import numpy
@@ -33,6 +35,43 @@ class FaceRecognition:
                 crop_image = image_copy [coordinates[2]:coordinates[3], coordinates[0]:coordinates[1]]
                 cv2.imwrite(os.path.normpath(os.path.join(export_dir, person_id, image_path.split(".")[0]+"_crop.jpg")), crop_image)
 
+    def export_resize_image_in_directory(self, dir: str, export_dir: str, prefix_name: str) -> None:
+        """
+        Resize Images in ROI and export in desired path
+
+        Args:
+            dir (str): Directory of face or mask images
+            export_dir (str): Export directory where cropped images are exported
+            prefix_name (str): Prefix to add for all images in directory
+        Return:
+            None
+        """
+        for image_path in paths.list_images(dir):
+            image = cv2.imread(image_path)
+            resize_image = cv2.resize(src = image, dsize=(32,25))
+            filename = str(os.path.basename(image_path.split(".")[0]))
+            print(os.path.join(export_dir, f"{prefix_name}{filename}.jpg"))
+            cv2.imwrite(os.path.join(export_dir, f"{prefix_name}{filename}.jpg"), resize_image)
+
+
+    def export_roi_in_directory(self, dir: str, export_dir: str, prefix_name: str) -> None:
+        """
+        Crop Test Images in ROI and export in desired path
+
+        Args:
+            dir (str): Directory of face or mask images
+            export_dir (str): Export directory where cropped images are exported
+            prefix_name (str): Prefix to add for all images in directory
+        Return:
+            None
+        """
+        for image_path in paths.list_images(dir):
+            image = cv2.imread(image_path)
+            crop_image = self.get_crop_based_on_geometrical_face_model(image)
+            filename = str(os.path.basename(image_path.split(".")[0]))
+            print(os.path.join(export_dir, f"{prefix_name}{filename}.jpg"))
+            cv2.imwrite(os.path.join(export_dir, f"{prefix_name}{filename}.jpg"), crop_image)
+
     def face_name_recognition(self, faces: tuple, gray_image: numpy.ndarray, svm_model_multiclass: sklearn.svm._classes.LinearSVC) -> tuple:
         """
         Face-Name Recognition in Real-Time
@@ -47,8 +86,8 @@ class FaceRecognition:
         """
         coordinates_roi = self.get_face_recognition_roi_coordinates(faces)
         crop_image = self.resize_crop_roi(coordinates_roi, gray_image)
-        prediction, hog_features = self.hog.extract_features_and_predict(crop_image, svm_model_multiclass)
-        return prediction, hog_features
+        hog_features = self.hog.extract_features(crop_image)
+        return hog_features
 
     @staticmethod
     def get_face_recognition_roi_coordinates(faces: tuple) -> tuple:
@@ -66,6 +105,15 @@ class FaceRecognition:
             xo2 = math.ceil(width*XO2_FACTOR)
             yo2 = math.ceil(height*YO2_FACTOR)
         return [x+xo1, x+xo2, y+yo1, y+yo2]
+
+    def get_crop_based_on_geometrical_face_model(self, image: numpy.ndarray) -> numpy.ndarray:
+        height, width,_ = image.shape
+        xo1 = math.floor(width/7)
+        yo1 = math.floor(height/7)
+        xo2 = math.ceil(width*18/21)
+        yo2 = math.ceil(height/2)
+        crop_image = image[yo1:yo2, xo1:xo2]
+        return crop_image
 
     @staticmethod
     def get_training_face_recognition_roi_coordinates(width: int, height: int) -> tuple:
@@ -96,5 +144,5 @@ class FaceRecognition:
             Cropped and resized image
         """
         crop_image = image[coordinates[2]:coordinates[3], coordinates[0]:coordinates[1]]
-        crop_resized = cv2.resize (crop_image, dsize=FINAL_SIZE)
+        crop_resized = cv2.resize(crop_image, dsize=(32,25))
         return crop_resized
