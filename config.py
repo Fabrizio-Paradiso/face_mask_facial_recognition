@@ -33,6 +33,7 @@ GREEN_COLOR         = (0,255,0)
 MATCH_SCALE         = 0.6
 LINE_THICKNESS      = 2
 RED_COLOR           = (0,0,255)
+BLACK_COLOR         = (0,0,0)
 TEXT_COLOR          = (0,255,0)
 TEXT_COORDINATES    = (10,35)
 TEXT_FONT           = cv2.FONT_HERSHEY_SIMPLEX

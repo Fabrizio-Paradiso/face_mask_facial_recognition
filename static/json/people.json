@@ -1,53 +1,52 @@
 [
     {
-      "id": 1,
+      "id": 0,
       "name": "Alfredo",
       "image":"static/assets/images/alfredo.png"
     },
     {
+      "id": 1,
+      "name": "Ciro",
+      "image": "static/assets/images/ciro.png"
+    },
+    {
       "id": 2,
-      "name": "Blas",
-      "image": "static/assets/images/blas.png"
+      "name": "Fabrizio",
+      "image":"static/assets/images/fabrizio.png"
     },
     {
       "id": 3,
-      "name": "Claudia",
-      "image":"static/assets/images/claudia.png"
+      "name": "Franco",
+      "image":"static/assets/images/franco.png"
     },
     {
       "id": 4,
-      "name": "Ernesto",
-      "image":"static/assets/images/ernesto.png"
+      "name": "Ignacio",
+      "image": "static/assets/images/ignacio.png"
     },
     {
       "id": 5,
-      "name": "Fabrizio",
-      "image": "static/assets/images/fabrizio.png"
-    },
-    {
-      "id": 6,
-      "name": "Franco",
-      "image": "static/assets/images/franco.png"
-    },
-    {
-      "id": 7,
       "name": "Isabella",
       "image": "static/assets/images/isabella.png"
     },
     {
-      "id": 8,
+      "id": 6,
+      "name": "Jeremias",
+      "image": "static/assets/images/jeremias.png"
+    },
+    {
+      "id": 7,
       "name": "Julieta",
       "image": "static/assets/images/julieta.png"
     },
     {
-      "id": 9,
+      "id": 8,
       "name": "Renata",
       "image": "static/assets/images/renata.png"
     },
     {
-      "id": 10,
+      "id": 9,
       "name": "Valentina",
       "image": "static/assets/images/valentina.png"
     }
   ]
-  
