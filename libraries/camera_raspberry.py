@@ -4,7 +4,7 @@ import cv2
 import numpy
 import time
 
-class Camera(object):
+class RaspberryCamera(object):
     def __init__(self, file_type: str = ".jpg", flip_vertical: bool = False, frame_rate: int = 32, photo_string: str = "Screenshot", resolution: tuple = (320, 240)) -> None:
         self.file_type = file_type
         self.flip_vertical = flip_vertical
