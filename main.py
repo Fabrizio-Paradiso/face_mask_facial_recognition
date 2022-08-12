@@ -1,5 +1,6 @@
 from flask import Flask, render_template, Response
-from libraries.common import add_date_to_frame, add_match_to_frame, create_bounding_box, get_ip_address_pc, get_ip_address_raspberry
+from libraries.common import add_date_to_frame, add_match_to_frame, create_bounding_box
+from libraries.host_device import HostDevice
 from libraries.hog import Hog
 from libraries.face_mask import FaceMask
 from libraries.face_recognition import FaceRecognition
@@ -9,7 +10,6 @@ from libraries.soup import Soup
 from libraries.webcam import Camera
 
 import cv2
-import sys
 import webbrowser
 
 mask: Mask = Mask()
@@ -20,15 +20,7 @@ face_mask: FaceMask = FaceMask()
 hog: Hog = Hog()
 soup: Soup = Soup()
 app = Flask(__name__, static_url_path="/static")
-
-ip_address = None
-
-if sys.argv[1]=="pc":
-    from libraries.camera_opencv import Camera
-    ip_address = get_ip_address_pc()
-if sys.argv[1]=="raspberry":
-    from libraries.camera_raspberry import Camera
-    ip_address = get_ip_address_raspberry()
+host_device = HostDevice()
 
 def generator(cam):
     while True:
@@ -60,9 +52,9 @@ def index():
 
 @app.route("/video_feed")
 def video_feed():
-    return Response(generator(Camera()), mimetype = "multipart/x-mixed-replace; boundary=frame")
+    return Response(generator(host_device.cam), mimetype = "multipart/x-mixed-replace; boundary=frame")
 
 if __name__ == "__main__":
-    soup.insert_ip_address(ip_address)
-    webbrowser.open_new(f"http://{ip_address}:5000/")
-    app.run(host=ip_address)
+    soup.insert_ip_address(host_device.ip_address)
+    webbrowser.open_new(f"http://{host_device.ip_address}:5000/")
+    app.run(host=host_device.ip_address)
