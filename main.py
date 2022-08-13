@@ -7,14 +7,12 @@ from libraries.face_recognition import FaceRecognition
 from libraries.mask import Mask
 from libraries.recognition import Recognition
 from libraries.soup import Soup
-from libraries.webcam import Camera
 
 import cv2
 import webbrowser
 
 mask: Mask = Mask()
 recognition: Recognition = Recognition()
-cam: Camera = Camera()
 face_recognition: FaceRecognition() = FaceRecognition()
 face_mask: FaceMask() = FaceMask()
 hog: Hog = Hog()
