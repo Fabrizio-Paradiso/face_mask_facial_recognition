@@ -18,7 +18,7 @@ def add_date_to_frame(frame: numpy.ndarray) -> None:
     Return:
         None
     """
-    cv2.putText(frame, str(datetime.now()), TEXT_COORDINATES, TEXT_FONT, FONT_SCALE, GREEN_COLOR, LINE_THICKNESS)
+    cv2.putText(frame, str(datetime.now().replace(microsecond=0)), TEXT_COORDINATES, TEXT_FONT, FONT_SCALE, GREEN_COLOR, LINE_THICKNESS)
 
 def add_match_to_frame(frame: numpy.ndarray, prediction_recognition: int, text_coordinates: str = (520, 360)) -> None:
     """
