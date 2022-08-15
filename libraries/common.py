@@ -1,11 +1,10 @@
-from config import BLUR_FILTER_SIZE, FONT_SCALE, GREEN_COLOR, BLACK_COLOR, LINE_THICKNESS, MATCH_SCALE, RESIZE_SIZE, TEXT_COORDINATES, TEXT_FONT, WHITE_COLOR
+from config import FONT_SCALE, GREEN_COLOR, BLACK_COLOR, LINE_THICKNESS, MATCH_SCALE, RESIZE_SIZE, TEXT_COORDINATES, TEXT_FONT, WHITE_COLOR
 from datetime import datetime
 from imutils import paths
 import cv2
 import json
 import numpy
 import os
-import sklearn.svm
 import socket
 import subprocess
 
