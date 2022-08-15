@@ -1,65 +1,41 @@
-from datetime import datetime
-from imutils.video.pivideostream import PiVideoStream
-import cv2
+from libraries.base_camera import BaseCamera
+from PIL import Image
+import io
 import numpy
+import cv2
+import picamera
 import time
 
-class RaspberryCamera(object):
-    def __init__(self, file_type: str = ".jpg", flip_vertical: bool = False, frame_rate: int = 32, photo_string: str = "Screenshot", resolution: tuple = (320, 240)) -> None:
-        self.file_type = file_type
-        self.flip_vertical = flip_vertical
-        self.frame_rate = frame_rate
-        self.resolution = resolution
-        self.photo_string = photo_string
-        self.video_stream = PiVideoStream(self.resolution, self.frame_rate).start()
-        time.sleep(2.0)
 
-    def __del__(self) -> None:
+class Camera(BaseCamera):
+    @staticmethod
+    def frames() -> numpy.ndarray:
         """
-        This function indicates that the thread should be stopped
+        This function is in charge of return the current frame from the Rasberry Cam.
+        First of all, let camera warm up and then set capture_continuous()
 
         Args:
-            self: Camera(object)
-        Return:
             None
-        """
-        self.video_stream.stop()
-
-    def flip_vertically_if_needed(self, frame: numpy.ndarray):
-        """
-        This function could flip vertically the frame captured by Raspberry Cam
-
-        Args:
-            self: Camera(object)
-            frame (numpy.ndarray): Frame captured by Raspberry Cam
         Return:
-            frame (numpy.ndarray)
+            frame (numpy.ndarray): Current frame
         """
-        if self.flip_vertical:
-            return numpy.flip(frame, 0)
-        return frame
+        with picamera.PiCamera() as camera:
+            time.sleep(2)
+            stream = io.BytesIO()
+            for _ in camera.capture_continuous(stream, 'jpeg', use_video_port=True):
+                stream.seek(0)
 
-    def get_frame(self):
-        """
-        This function returns the frame captured by Raspberry Cam in numpy format
+                # Convert bytes frame to PIL type image
+                stream_pil = Image.open(stream)
 
-        Args:
-            self: Camera(object)
-        Return:
-            frame (numpy.ndarray)
-        """
-        frame = self.flip_vertically_if_needed(self.video_stream.read())
-        self.previous_frame = frame.copy()
-        return frame
+                # Convert PIL image to numpy array BGR
+                stream_numpy_bgr = numpy.asarray(stream_pil)
 
-    def take_picture(self):
-        """
-        This function takes a picture from the frame captured by Raspberry Cam
+                # Convert numpy array from BGR to RGB
+                stream_numpy_rgb = cv2.cvtColor(stream_numpy_bgr)
 
-        Args:
-            self: Camera(object)
-        Return:
-            None
-        """
-        today_date = datetime.now().strftime("%m%d%Y-%H%M%S")
-        cv2.imwrite(f"{self.photo_string}_{today_date}{self.file_type}", self.get_frame())
+                # Flip frame vertically for Raspberry Cam
+                stream_flip = numpy.flip(stream_numpy_rgb, axis=0)
+                yield stream_flip
+                stream.seek(0)
+                stream.truncate()
