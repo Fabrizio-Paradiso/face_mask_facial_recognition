@@ -1,4 +1,3 @@
-from libraries.camera_opencv import Camera
 from libraries.common import get_ip_address_pc, get_ip_address_raspberry
 import os
 
@@ -16,9 +15,11 @@ class HostDevice():
             None
         '''
         if os.getenv("HOST_DEVICE")=="pc":
+            from libraries.camera_opencv import Camera
             self.ip_address = get_ip_address_pc()
             self.cam : Camera() = Camera()
+
         if os.getenv("HOST_DEVICE")=="raspberry":
-            from libraries.camera_raspberry import RaspberryCamera
+            from libraries.camera_raspberry import Camera
             self.ip_address = get_ip_address_raspberry()
-            self.cam : RaspberryCamera = RaspberryCamera()
+            self.cam : Camera () = Camera()
