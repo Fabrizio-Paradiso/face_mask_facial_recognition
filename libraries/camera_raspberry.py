@@ -1,6 +1,6 @@
 from picamera.array import PiRGBArray
 from picamera import PiCamera
-from base_camera import BaseCamera
+from libraries.base_camera import BaseCamera
 
 class Camera(BaseCamera):
     @staticmethod

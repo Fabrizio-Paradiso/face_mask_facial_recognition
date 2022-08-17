@@ -34,12 +34,9 @@ def add_match_to_frame(frame: numpy.ndarray, prediction_recognition: int, text_c
     match_image = cv2.imread(f"{image_path}")
     size = 100
     logo = cv2.resize(match_image, (size, size))
-    gray_logo = cv2.cvtColor(logo, cv2.COLOR_BGR2GRAY)
-    _, mask = cv2.threshold(gray_logo, 1, 255, cv2.THRESH_BINARY)
-    roi = frame[-size-10:-10, -size-10:-10]
-    roi[numpy.where(mask)] = 0
+    added_image = cv2.addWeighted(frame[-size-10:-10, -size-10:-10, :], 0, logo[0:100,0:100, :], 1, 0)
+    frame[-size-10:-10, -size-10:-10, :] = added_image
     cv2.putText(frame, f"Match found", text_coordinates, TEXT_FONT, MATCH_SCALE, BLACK_COLOR, LINE_THICKNESS)
-    roi += logo
 
 def blur_and_resize_images_in_directory(path_directory: str):
     for image_path in paths.list_images(path_directory):
