@@ -26,6 +26,4 @@ At the same time, it is been taken into account three possible mask to wearing. 
 
 Finally, once all this possibilites are been applied to the set of images, for each person you have these images.
 
-![face_mask](static/assets/styles/face_mask.jpg?raw=true)
-![bottom_lip](static/assets/styles/bottom_lip.jpg?raw=true)
-![top_lip](static/assets/styles/top_lip.jpg?raw=true)
+![dataset](static/assets/styles/dataset.jpg?raw=true)
