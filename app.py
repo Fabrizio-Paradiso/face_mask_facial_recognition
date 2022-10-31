@@ -13,8 +13,8 @@ host_device = HostDevice()
 def generator(cam):
     while True:
         frame = cam.get_frame()
-        application_process(frame)
-        (flag, encoded_image) = cv2.imencode(".jpg", frame)
+        frame_stream = application_process(frame)
+        (flag, encoded_image) = cv2.imencode(".jpg", frame_stream)
         if not flag:
             continue
         yield(b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + bytearray(encoded_image) + b"\r\n")
