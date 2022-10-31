@@ -35,8 +35,10 @@ def add_match_to_frame(frame: numpy.ndarray, prediction_recognition: int, text_c
     size = 100
     logo = cv2.resize(match_image, (size, size))
     added_image = cv2.addWeighted(frame[-size-10:-10, -size-10:-10, :], 0, logo[0:100,0:100, :], 1, 0)
-    frame[-size-10:-10, -size-10:-10, :] = added_image
-    cv2.putText(frame, f"Match found", text_coordinates, TEXT_FONT, MATCH_SCALE, BLACK_COLOR, LINE_THICKNESS)
+    frame_copy = numpy.copy(frame)
+    frame_copy[-size-10:-10, -size-10:-10, :] = added_image
+    cv2.putText(frame_copy, f"Match found", text_coordinates, TEXT_FONT, MATCH_SCALE, BLACK_COLOR, LINE_THICKNESS)
+    return frame_copy
 
 def blur_and_resize_images_in_directory(path_directory: str):
     for image_path in paths.list_images(path_directory):

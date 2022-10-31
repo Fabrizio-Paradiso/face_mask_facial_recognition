@@ -28,7 +28,11 @@ def application_process(frame: numpy.ndarray) -> None:
         recognition_features = recognition.hog.extract_features(recognition_crop)
         mask_prediction = mask.mask_prediction(mask_features)
         recognition_prediction = recognition.recognition_prediction(recognition_features)
-        add_match_to_frame(frame, recognition_prediction)
-        create_bounding_box(faces, frame, mask_prediction, recognition_prediction)
+        frame_stream = add_match_to_frame(frame, recognition_prediction)
+        create_bounding_box(faces, frame_stream, mask_prediction, recognition_prediction)
+
     except:
+        frame_stream = frame
         logger.info('No face found')
+
+    return frame_stream
