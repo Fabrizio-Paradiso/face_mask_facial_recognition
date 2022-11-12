@@ -7,7 +7,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif; 
+  font-family: 'Poppins', sans-serif;
   text-transform: uppercase;
 }
 
@@ -21,7 +21,7 @@ body {
   background-image: url('../assets/styles/background.jpg');
   background-repeat: no-repeat;
   background-size: cover;
-  background-position: top; 
+  background-position: top;
 }
 
 /*  */
@@ -216,7 +216,7 @@ body {
   left: -2px;
   box-shadow: 5px 0 0 #0f0,
               5px 0 0 #0f0;
-  transition-delay: 0s, 0.5, 0.5s, 1s; 
+  transition-delay: 0s, 0.5, 0.5s, 1s;
 }
 
 .container-buttons a::after
@@ -244,8 +244,5 @@ body {
   right: -2px;
   box-shadow: -5px 0 0 #0f0,
               -5px 0 0 #0f0;
-  transition-delay: 0s, 0.5, 0.5s, 1s; 
+  transition-delay: 0s, 0.5, 0.5s, 1s;
 }
-
-
-

@@ -4,17 +4,20 @@ from libraries.data import Data
 import os
 import numpy
 
-class Recognition():
+
+class Recognition:
     def __init__(self) -> None:
         self.svm_model_path = os.path.normpath(f"models/face_recognition.xml")
-        self.svm_model_csv = (f'models/recognition.csv')
+        self.svm_model_csv = f"models/recognition.csv"
         self.face_recognition: FaceRecognition = FaceRecognition()
         self.hog: Hog = Hog()
-        self.model = self.hog.load_svm_model (self.svm_model_path)
+        self.model = self.hog.load_svm_model(self.svm_model_path)
         self.pca_decomposition = 66
         self.data = Data(self.svm_model_csv, self.pca_decomposition)
 
-    def recognition_crop(self, faces: tuple, gray_image: numpy.ndarray) -> numpy.ndarray:
+    def recognition_crop(
+        self, faces: tuple, gray_image: numpy.ndarray
+    ) -> numpy.ndarray:
         """
         Get cropped image in Face-Recognition ROI
 
@@ -24,7 +27,9 @@ class Recognition():
         Return:
             Cropped image in Face-Recognition ROI resized for prediction
         """
-        coordinates_roi = self.face_recognition.get_face_recognition_roi_coordinates(faces)
+        coordinates_roi = self.face_recognition.get_face_recognition_roi_coordinates(
+            faces
+        )
         crop_image = self.face_recognition.resize_crop_roi(coordinates_roi, gray_image)
         return crop_image
 

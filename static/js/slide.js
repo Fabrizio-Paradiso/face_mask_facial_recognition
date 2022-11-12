@@ -7,12 +7,12 @@ const textOutTimer = 2800
 
 function animateText() {
   for(let i=0; i<textsLength; i++){
-    texts[i].classList.remove("text-in","text-out");  
+    texts[i].classList.remove("text-in","text-out");
   }
   texts[index].classList.add("text-in");
 
   setTimeout(function(){
-    texts[index].classList.add("text-out");              
+    texts[index].classList.add("text-out");
   },textOutTimer)
 
   setTimeout(function(){
@@ -24,7 +24,7 @@ function animateText() {
     index++;
   }
   animateText();
-  },textInTimer); 
+  },textInTimer);
 }
 
 window.onload=animateText;

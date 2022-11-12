@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 
-class Soup():
+
+class Soup:
     def __init__(self) -> None:
         pass
 
@@ -15,13 +16,15 @@ class Soup():
         Return:
             None
         """
-        new_tag = soup.new_tag('a', id="ip-address")
-        new_tag.string=f"{ip_address}"
-        container_tag = soup.find("span", {"id":"sub-title-span"})
+        new_tag = soup.new_tag("a", id="ip-address")
+        new_tag.string = f"{ip_address}"
+        container_tag = soup.find("span", {"id": "sub-title-span"})
         container_tag.append(new_tag)
 
     @classmethod
-    def insert_ip_address(cls, ip_address: str, path_file: str = f"templates/index.html") -> None:
+    def insert_ip_address(
+        cls, ip_address: str, path_file: str = f"templates/index.html"
+    ) -> None:
         """
         This function insert IPv4 address in HTML
 
@@ -34,11 +37,11 @@ class Soup():
         contents = open(path_file, "r").read()
         soup = BeautifulSoup(contents, "lxml")
 
-        if(soup.find("a", {"id":"ip-address"}).get_text() is not ip_address):
-            soup.find("a", {"id":"ip-address"}).extract()
+        if soup.find("a", {"id": "ip-address"}).get_text() is not ip_address:
+            soup.find("a", {"id": "ip-address"}).extract()
             cls.add_ip_address_tag(soup, ip_address)
 
-        if(soup.find("a", {"id":"ip-address"}) is None):
+        if soup.find("a", {"id": "ip-address"}) is None:
             cls.add_ip_address_tag(soup, ip_address)
 
         savechanges = soup.prettify("utf-8")
