@@ -41,7 +41,7 @@ def add_date_to_frame(frame: numpy.ndarray) -> None:
 
 def add_match_to_frame(
     frame: numpy.ndarray,
-    prediction_recognition: int,
+    prediction_recognition: tuple,
     text_coordinates: str = (520, 360),
 ) -> None:
     """
@@ -49,12 +49,18 @@ def add_match_to_frame(
 
     Args:
         frame (numpy.ndarray): Frame captured by camera in Real-Time
-        recognition_hog (tuple): Decision about recognition made by SVM multi-class model
+        prediction_recognition (tuple): Decision about recognition made by SVM multi-class model
         text_coordinates (tuple): Text location coordinates
     Return:
         None
     """
-    image_path = json_id_to_image_person(prediction_recognition)
+    unknown_path = "static/assets/images/unknown.png"
+    is_unknown = prediction_recognition[1]
+    image_path = (
+        json_id_to_image_person(prediction_recognition[0])
+        if is_unknown is False
+        else unknown_path
+    )
     match_image = cv2.imread(f"{image_path}")
     size = 100
     logo = cv2.resize(match_image, (size, size))
@@ -123,6 +129,7 @@ def header_face_recognition(
     Return:
         None
     """
+    is_unknown = prediction[1]
     prediction_label = json_id_to_recognition_label(prediction[0])
     cv2.rectangle(
         frame,
@@ -133,13 +140,14 @@ def header_face_recognition(
     )
     cv2.putText(
         frame,
-        f"{prediction_label}",
+        f'{"Unknown" if is_unknown else prediction_label}',
         (faces[0, 0], faces[0, 1]),
         TEXT_FONT,
         FONT_SCALE,
         BLACK_COLOR,
         LINE_THICKNESS,
     )
+    return
 
 
 def face_bounding_box(faces: tuple, frame: numpy.ndarray) -> None:
