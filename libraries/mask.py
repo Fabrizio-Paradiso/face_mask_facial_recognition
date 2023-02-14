@@ -4,17 +4,18 @@ from libraries.data import Data
 import os
 import numpy
 
-class Mask():
+
+class Mask:
     def __init__(self) -> None:
         self.svm_model_path = os.path.normpath(f"models/face_mask.xml")
-        self.svm_model_csv = ('models/mask.csv')
-        self.face_mask: FaceMask = FaceMask ()
+        self.svm_model_csv = "models/mask.csv"
+        self.face_mask: FaceMask = FaceMask()
         self.hog: Hog = Hog()
-        self.model =  self.hog.load_svm_model (self.svm_model_path)
+        self.model = self.hog.load_svm_model(self.svm_model_path)
         self.pca_decomposition = 2
         self.data = Data(self.svm_model_csv, self.pca_decomposition)
 
-    def mask_crop (self, faces: tuple, gray_image: numpy.ndarray) -> numpy.ndarray:
+    def mask_crop(self, faces: tuple, gray_image: numpy.ndarray) -> numpy.ndarray:
         """
         Get cropped image in Face-Mask ROI
 

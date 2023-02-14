@@ -38,7 +38,7 @@ async function addImagesToPDFandSavePDF(images, pdf){
 }
 
 function addImageToPDF(url, index, pdf) {
-  return new Promise(resolve => { 
+  return new Promise(resolve => {
     let image = new Image();
     image.onload = (() => {
       drawImageScaled(image)
@@ -52,12 +52,12 @@ function addImageToPDF(url, index, pdf) {
 
 function drawImageScaled(image) {
   var widthRatio = canvas.width / image.width
-  var heightRatio =  canvas.height / image.height  
+  var heightRatio =  canvas.height / image.height
   var ratio  = Math.min(widthRatio, heightRatio)
   var centerShiftX = (canvas.width - image.width*ratio ) / 2
-  var centerShiftY = (canvas.height - image.height*ratio ) / 2 
+  var centerShiftY = (canvas.height - image.height*ratio ) / 2
   context.clearRect(0, 0, canvas.width, canvas.height)
-  context.drawImage(image, 0, 0, image.width, image.height, centerShiftX, centerShiftY, image.width*ratio, image.height*ratio) 
+  context.drawImage(image, 0, 0, image.width, image.height, centerShiftX, centerShiftY, image.width*ratio, image.height*ratio)
 }
 
 function* enumerate(iterable) {

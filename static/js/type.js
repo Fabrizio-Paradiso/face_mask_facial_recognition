@@ -4,7 +4,7 @@ const cursorSpan = document.querySelector(".cursor")
 const textArray = ["mask detection", "recognition"]
 const typingDelay = 200
 const erasingDelay = 100
-const newTextDelay = 2000 
+const newTextDelay = 2000
 let textArrayIndex = 0
 let charIndex = 0
 
@@ -14,7 +14,7 @@ function type() {
     typedTextSpan.textContent += textArray[textArrayIndex].charAt(charIndex)
     charIndex++
     setTimeout(type, typingDelay)
-  } 
+  }
   else {
     cursorSpan.classList.remove("typing")
   	setTimeout(erase, newTextDelay)
@@ -27,7 +27,7 @@ function erase() {
     typedTextSpan.textContent = textArray[textArrayIndex].substring(0, charIndex-1)
     charIndex--
     setTimeout(erase, erasingDelay)
-  } 
+  }
   else {
     cursorSpan.classList.remove("typing")
     textArrayIndex++

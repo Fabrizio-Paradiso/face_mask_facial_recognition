@@ -1,4 +1,14 @@
-from config import FONT_SCALE, GREEN_COLOR, BLACK_COLOR, LINE_THICKNESS, MATCH_SCALE, RESIZE_SIZE, TEXT_COORDINATES, TEXT_FONT, WHITE_COLOR
+from config import (
+    FONT_SCALE,
+    GREEN_COLOR,
+    BLACK_COLOR,
+    LINE_THICKNESS,
+    MATCH_SCALE,
+    RESIZE_SIZE,
+    TEXT_COORDINATES,
+    TEXT_FONT,
+    WHITE_COLOR,
+)
 from datetime import datetime
 from imutils import paths
 import cv2
@@ -7,6 +17,7 @@ import numpy
 import os
 import socket
 import subprocess
+
 
 def add_date_to_frame(frame: numpy.ndarray) -> None:
     """
@@ -17,34 +28,64 @@ def add_date_to_frame(frame: numpy.ndarray) -> None:
     Return:
         None
     """
-    cv2.putText(frame, str(datetime.now().replace(microsecond=0)), TEXT_COORDINATES, TEXT_FONT, FONT_SCALE, GREEN_COLOR, LINE_THICKNESS)
+    cv2.putText(
+        frame,
+        str(datetime.now().replace(microsecond=0)),
+        TEXT_COORDINATES,
+        TEXT_FONT,
+        FONT_SCALE,
+        GREEN_COLOR,
+        LINE_THICKNESS,
+    )
 
-def add_match_to_frame(frame: numpy.ndarray, prediction_recognition: int, text_coordinates: str = (520, 360)) -> None:
+
+def add_match_to_frame(
+    frame: numpy.ndarray,
+    prediction_recognition: tuple,
+    text_coordinates: str = (520, 360),
+) -> None:
     """
     Add Match Found image in right bottom corner of frame
 
     Args:
         frame (numpy.ndarray): Frame captured by camera in Real-Time
-        recognition_hog (tuple): Decision about recognition made by SVM multi-class model
+        prediction_recognition (tuple): Decision about recognition made by SVM multi-class model
         text_coordinates (tuple): Text location coordinates
     Return:
         None
     """
-    image_path = json_id_to_image_person(prediction_recognition)
+    unknown_path = "static/assets/images/unknown.png"
+    is_unknown = prediction_recognition[1]
+    image_path = (
+        json_id_to_image_person(prediction_recognition[0])
+        if is_unknown is False
+        else unknown_path
+    )
     match_image = cv2.imread(f"{image_path}")
     size = 100
     logo = cv2.resize(match_image, (size, size))
-    added_image = cv2.addWeighted(frame[-size-10:-10, -size-10:-10, :], 0, logo[0:100,0:100, :], 1, 0)
+    added_image = cv2.addWeighted(
+        frame[-size - 10 : -10, -size - 10 : -10, :], 0, logo[0:100, 0:100, :], 1, 0
+    )
     frame_copy = numpy.copy(frame)
-    frame_copy[-size-10:-10, -size-10:-10, :] = added_image
-    cv2.putText(frame_copy, f"Match found", text_coordinates, TEXT_FONT, MATCH_SCALE, BLACK_COLOR, LINE_THICKNESS)
+    frame_copy[-size - 10 : -10, -size - 10 : -10, :] = added_image
+    cv2.putText(
+        frame_copy,
+        f"Match found",
+        text_coordinates,
+        TEXT_FONT,
+        MATCH_SCALE,
+        BLACK_COLOR,
+        LINE_THICKNESS,
+    )
     return frame_copy
+
 
 def blur_and_resize_images_in_directory(path_directory: str):
     for image_path in paths.list_images(path_directory):
         image = cv2.imread(image_path)
-        image_filtered = cv2.GaussianBlur(image, (3,3), cv2.BORDER_DEFAULT)
-        image_resized = cv2.resize(src = image_filtered, dsize=RESIZE_SIZE)
+        image_filtered = cv2.GaussianBlur(image, (3, 3), cv2.BORDER_DEFAULT)
+        image_resized = cv2.resize(src=image_filtered, dsize=RESIZE_SIZE)
         cv2.imwrite(image_path, image_resized)
         print(image_path)
 
@@ -59,10 +100,27 @@ def header_face_mask(faces: tuple, frame: numpy.ndarray, prediction: int) -> Non
         None
     """
     prediction_label = json_id_to_mask_label(prediction[0])
-    cv2.rectangle(frame, (faces[0][0]-1, faces[0][1]-52), (faces[0][0]+faces[0][2]+1, faces[0][1]-20), WHITE_COLOR, -1)
-    cv2.putText(frame, f"{prediction_label}", (faces[0,0], faces[0,1]-30), TEXT_FONT, FONT_SCALE, BLACK_COLOR, LINE_THICKNESS)
+    cv2.rectangle(
+        frame,
+        (faces[0][0] - 1, faces[0][1] - 52),
+        (faces[0][0] + faces[0][2] + 1, faces[0][1] - 20),
+        WHITE_COLOR,
+        -1,
+    )
+    cv2.putText(
+        frame,
+        f"{prediction_label}",
+        (faces[0, 0], faces[0, 1] - 30),
+        TEXT_FONT,
+        FONT_SCALE,
+        BLACK_COLOR,
+        LINE_THICKNESS,
+    )
 
-def header_face_recognition(faces: tuple, frame: numpy.ndarray, prediction: int) -> None:
+
+def header_face_recognition(
+    faces: tuple, frame: numpy.ndarray, prediction: int
+) -> None:
     """
     Header for Face-Name Recognition
 
@@ -71,9 +129,26 @@ def header_face_recognition(faces: tuple, frame: numpy.ndarray, prediction: int)
     Return:
         None
     """
+    is_unknown = prediction[1]
     prediction_label = json_id_to_recognition_label(prediction[0])
-    cv2.rectangle(frame, (faces[0,0]-1, faces[0,1]-20), (faces[0,0]+faces[0,2]+1, faces[0,1]+5), WHITE_COLOR, -1)
-    cv2.putText(frame, f"{prediction_label}", (faces[0,0], faces[0,1]), TEXT_FONT, FONT_SCALE, BLACK_COLOR, LINE_THICKNESS)
+    cv2.rectangle(
+        frame,
+        (faces[0, 0] - 1, faces[0, 1] - 20),
+        (faces[0, 0] + faces[0, 2] + 1, faces[0, 1] + 5),
+        WHITE_COLOR,
+        -1,
+    )
+    cv2.putText(
+        frame,
+        f'{"Unknown" if is_unknown else prediction_label}',
+        (faces[0, 0], faces[0, 1]),
+        TEXT_FONT,
+        FONT_SCALE,
+        BLACK_COLOR,
+        LINE_THICKNESS,
+    )
+    return
+
 
 def face_bounding_box(faces: tuple, frame: numpy.ndarray) -> None:
     """
@@ -84,9 +159,21 @@ def face_bounding_box(faces: tuple, frame: numpy.ndarray) -> None:
     Return:
         None
     """
-    cv2.rectangle(frame, (faces[0,0], faces[0,1]), (faces[0,0]+faces[0,2], faces[0,1]+faces[0,3]), WHITE_COLOR, 2)
+    cv2.rectangle(
+        frame,
+        (faces[0, 0], faces[0, 1]),
+        (faces[0, 0] + faces[0, 2], faces[0, 1] + faces[0, 3]),
+        WHITE_COLOR,
+        2,
+    )
 
-def create_bounding_box(faces: tuple, frame: numpy.ndarray, mask_prediction: tuple, recognition_prediction: tuple) -> None:
+
+def create_bounding_box(
+    faces: tuple,
+    frame: numpy.ndarray,
+    mask_prediction: tuple,
+    recognition_prediction: tuple,
+) -> None:
     """
     Create bounding box for user interface
 
@@ -102,6 +189,7 @@ def create_bounding_box(faces: tuple, frame: numpy.ndarray, mask_prediction: tup
     header_face_recognition(faces, frame, recognition_prediction)
     header_face_mask(faces, frame, mask_prediction)
 
+
 def get_ip_address_raspberry() -> str:
     """
     Get Raspberry IP address from LAN
@@ -113,6 +201,7 @@ def get_ip_address_raspberry() -> str:
     """
     return subprocess.check_output(["hostname", "-I"]).decode("utf-8").strip()
 
+
 def get_ip_address_pc() -> str:
     """
     Get PC IP address from LAN
@@ -123,6 +212,7 @@ def get_ip_address_pc() -> str:
         PC Local IP address (str)
     """
     return socket.gethostbyname(socket.gethostname())
+
 
 def json_id_to_mask_label(id: int) -> str:
     """
@@ -139,6 +229,7 @@ def json_id_to_mask_label(id: int) -> str:
     item = next((item for item in items if item["id"] == id), None)
     return str(item["label"])
 
+
 def json_id_to_recognition_label(id: int) -> str:
     """
     Find the label for Face-Recognition searching by id
@@ -153,6 +244,7 @@ def json_id_to_recognition_label(id: int) -> str:
 
     item = next((item for item in items if item["id"] == id), None)
     return str(item["name"])
+
 
 def json_id_to_image_person(id: int) -> str:
     """
@@ -169,6 +261,7 @@ def json_id_to_image_person(id: int) -> str:
     person = next((person for person in people if person["id"] == id), None)
     return str(person["image"])
 
+
 def rename_images(path_images: str, prefix_name: str) -> None:
     """
     Rename all files in a directory
@@ -182,7 +275,11 @@ def rename_images(path_images: str, prefix_name: str) -> None:
     files = os.listdir(path_images)
     for index, file in enumerate(files):
         index_image = str(index)
-        os.rename(os.path.join(path_images,file), os.path.join(path_images,f"{prefix_name}_{index_image}.jpg"))
+        os.rename(
+            os.path.join(path_images, file),
+            os.path.join(path_images, f"{prefix_name}_{index_image}.jpg"),
+        )
+
 
 def show_face_mask_roi(frame: numpy.ndarray, coordinates: tuple) -> None:
     """
@@ -194,5 +291,10 @@ def show_face_mask_roi(frame: numpy.ndarray, coordinates: tuple) -> None:
     Return:
         None
     """
-    cv2.rectangle(frame, (coordinates[0], coordinates[2]), (coordinates[1], coordinates[3]), GREEN_COLOR, LINE_THICKNESS)
-
+    cv2.rectangle(
+        frame,
+        (coordinates[0], coordinates[2]),
+        (coordinates[1], coordinates[3]),
+        GREEN_COLOR,
+        LINE_THICKNESS,
+    )

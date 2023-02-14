@@ -8,13 +8,16 @@ import numpy
 import os
 import sklearn.svm
 
+
 class FaceRecognition:
-    def __init__ (self) -> None:
-        self.FACE_CASCADE = cv2.CascadeClassifier((cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'))
+    def __init__(self) -> None:
+        self.FACE_CASCADE = cv2.CascadeClassifier(
+            (cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+        )
         self.hog: Hog = Hog()
 
     @classmethod
-    def crop_dataset (cls, dataset_dir: str, export_dir: str) -> None:
+    def crop_dataset(cls, dataset_dir: str, export_dir: str) -> None:
         """
         Crop Dataset in ROI and export in desired path
 
@@ -32,10 +35,23 @@ class FaceRecognition:
                 h, w, _ = image_rgb.shape
                 image_copy = image_rgb.copy()
                 coordinates = cls.get_training_face_recognition_roi_coordinates(w, h)
-                crop_image = image_copy [coordinates[2]:coordinates[3], coordinates[0]:coordinates[1]]
-                cv2.imwrite(os.path.normpath(os.path.join(export_dir, person_id, image_path.split(".")[0]+"_crop.jpg")), crop_image)
+                crop_image = image_copy[
+                    coordinates[2] : coordinates[3], coordinates[0] : coordinates[1]
+                ]
+                cv2.imwrite(
+                    os.path.normpath(
+                        os.path.join(
+                            export_dir,
+                            person_id,
+                            image_path.split(".")[0] + "_crop.jpg",
+                        )
+                    ),
+                    crop_image,
+                )
 
-    def export_resize_image_in_directory(self, dir: str, export_dir: str, prefix_name: str) -> None:
+    def export_resize_image_in_directory(
+        self, dir: str, export_dir: str, prefix_name: str
+    ) -> None:
         """
         Resize Images in ROI and export in desired path
 
@@ -48,13 +64,16 @@ class FaceRecognition:
         """
         for image_path in paths.list_images(dir):
             image = cv2.imread(image_path)
-            resize_image = cv2.resize(src = image, dsize=(32,25))
+            resize_image = cv2.resize(src=image, dsize=(32, 25))
             filename = str(os.path.basename(image_path.split(".")[0]))
             print(os.path.join(export_dir, f"{prefix_name}{filename}.jpg"))
-            cv2.imwrite(os.path.join(export_dir, f"{prefix_name}{filename}.jpg"), resize_image)
+            cv2.imwrite(
+                os.path.join(export_dir, f"{prefix_name}{filename}.jpg"), resize_image
+            )
 
-
-    def export_roi_in_directory(self, dir: str, export_dir: str, prefix_name: str) -> None:
+    def export_roi_in_directory(
+        self, dir: str, export_dir: str, prefix_name: str
+    ) -> None:
         """
         Crop Test Images in ROI and export in desired path
 
@@ -70,9 +89,16 @@ class FaceRecognition:
             crop_image = self.get_crop_based_on_geometrical_face_model(image)
             filename = str(os.path.basename(image_path.split(".")[0]))
             print(os.path.join(export_dir, f"{prefix_name}{filename}.jpg"))
-            cv2.imwrite(os.path.join(export_dir, f"{prefix_name}{filename}.jpg"), crop_image)
+            cv2.imwrite(
+                os.path.join(export_dir, f"{prefix_name}{filename}.jpg"), crop_image
+            )
 
-    def face_name_recognition(self, faces: tuple, gray_image: numpy.ndarray, svm_model_multiclass: sklearn.svm._classes.LinearSVC) -> tuple:
+    def face_name_recognition(
+        self,
+        faces: tuple,
+        gray_image: numpy.ndarray,
+        svm_model_multiclass: sklearn.svm._classes.LinearSVC,
+    ) -> tuple:
         """
         Face-Name Recognition in Real-Time
 
@@ -100,18 +126,20 @@ class FaceRecognition:
             Face-Name Recognition ROI
         """
         for (x, y, width, height) in faces:
-            xo1 = math.floor(width*XO1_FACTOR)
-            yo1 = math.floor(height*YO1_FACTOR)
-            xo2 = math.ceil(width*XO2_FACTOR)
-            yo2 = math.ceil(height*YO2_FACTOR)
-        return [x+xo1, x+xo2, y+yo1, y+yo2]
+            xo1 = math.floor(width * XO1_FACTOR)
+            yo1 = math.floor(height * YO1_FACTOR)
+            xo2 = math.ceil(width * XO2_FACTOR)
+            yo2 = math.ceil(height * YO2_FACTOR)
+        return [x + xo1, x + xo2, y + yo1, y + yo2]
 
-    def get_crop_based_on_geometrical_face_model(self, image: numpy.ndarray) -> numpy.ndarray:
-        height, width,_ = image.shape
-        xo1 = math.floor(width/7)
-        yo1 = math.floor(height/7)
-        xo2 = math.ceil(width*18/21)
-        yo2 = math.ceil(height/2)
+    def get_crop_based_on_geometrical_face_model(
+        self, image: numpy.ndarray
+    ) -> numpy.ndarray:
+        height, width, _ = image.shape
+        xo1 = math.floor(width / 7)
+        yo1 = math.floor(height / 7)
+        xo2 = math.ceil(width * 18 / 21)
+        yo2 = math.ceil(height / 2)
         crop_image = image[yo1:yo2, xo1:xo2]
         return crop_image
 
@@ -126,14 +154,14 @@ class FaceRecognition:
         Return:
             Face-Name Recognition ROI
         """
-        xo1 = math.floor(width*XO1_FACTOR)
-        yo1 = math.floor(height*YO1_FACTOR)
-        xo2 = math.ceil(width*XO2_FACTOR)
-        yo2 = math.ceil(height*YO2_FACTOR)
+        xo1 = math.floor(width * XO1_FACTOR)
+        yo1 = math.floor(height * YO1_FACTOR)
+        xo2 = math.ceil(width * XO2_FACTOR)
+        yo2 = math.ceil(height * YO2_FACTOR)
         return [xo1, xo2, yo1, yo2]
 
     @staticmethod
-    def resize_crop_roi (coordinates: tuple, image: numpy.ndarray) -> numpy.ndarray:
+    def resize_crop_roi(coordinates: tuple, image: numpy.ndarray) -> numpy.ndarray:
         """
         Crop image in ROI and resize
 
@@ -143,6 +171,8 @@ class FaceRecognition:
         Return:
             Cropped and resized image
         """
-        crop_image = image[coordinates[2]:coordinates[3], coordinates[0]:coordinates[1]]
-        crop_resized = cv2.resize(crop_image, dsize=(32,25))
+        crop_image = image[
+            coordinates[2] : coordinates[3], coordinates[0] : coordinates[1]
+        ]
+        crop_resized = cv2.resize(crop_image, dsize=(32, 25))
         return crop_resized
